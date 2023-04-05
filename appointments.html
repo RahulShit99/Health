@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Appointments</title>
+    <style>
+      #appointments {
+        list-style: none;
+        padding: 0;
+      }
+
+      #appointments li {
+        margin-bottom: 10px;
+      }
+
+      #appointments label {
+        display: flex;
+        align-items: center;
+      }
+
+      #appointments input[type="checkbox"] {
+        margin-right: 10px;
+      }
+
+      .missed {
+        color: red;
+        text-decoration: line-through;
+      }
+      
+    </style>
+  </head>
+  <body>
+    <h1 class="op">My Appointments</h1>
+    <p id="date"></p>
+    <ul id="appointments"></ul>
+    <script>
+      const appointments = [
+        { time: "9:00 AM", description: "Get The Insuline Injection" },
+        { time: "11:00 AM", description: "Daily Checkup" },
+        { time: "1:00 PM", description: "Have Lunch" },
+        { time: "2:00 PM", description: "Drink Water atmost 5 Litere" },
+        { time: "3:00 PM", description: "Check Pressure" },
+        { time: "9:00 PM", description: "Have Dinner" },
+        { time: "10:00 PM", description: "Put the drops in your eyes and go to sleep." },
+      ];
+
+      function updateDate() {
+        const now = new Date();
+        const dateElement = document.getElementById("date");
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateElement.textContent = now.toLocaleDateString('en-US', options);
+      }
+
+      function checkReminders() {
+        const now = new Date();
+        const appointmentTimes = appointments.map((a) => {
+          const appointmentTime = new Date(`${now.toLocaleDateString('en-US')} ${a.time}`);
+          return appointmentTime;
+        });
+
+        appointmentTimes.forEach((time, index) => {
+          const diffInMinutes = Math.round((time - now) / 1000 / 60);
+
+          if (diffInMinutes === 0) {
+            alert(`Reminder: ${appointments[index].description}`);
+          }
+        });
+      }
+
+      function createAppointmentList() {
+        const now = new Date();
+        const appointmentList = document.getElementById("appointments");
+
+        appointments.forEach((appointment) => {
+          const appointmentTime = new Date(
+            `${now.toLocaleDateString('en-US')} ${appointment.time}`
+          );
+
+          const listItem = document.createElement("li");
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = "appointment";
+          checkbox.value = appointment.description;
+
+          const label = document.createElement("label");
+          label.innerHTML = `${appointment.time} - ${appointment.description}`;
+
+          if (now > appointmentTime) {
+            label.classList.add("missed");
+          }
+
+          label.prepend(checkbox);
+          listItem.appendChild(label);
+
+          checkbox.addEventListener("click", () => {
+            if (checkbox.checked) {
+              alert(`Appointment "${appointment.description}" completed!`);
+            }
+          });
+
+          appointmentList.appendChild(listItem);
+        });
+      }
+
+      updateDate();
+      checkReminders();
+      createAppointmentList();
+
+      setInterval(() => {
+        updateDate();
+        checkReminders();
+      }, 60 * 1000);
+    </script>
+  </body>
+</html>
